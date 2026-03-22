@@ -25,8 +25,9 @@ st.set_page_config(
 st.markdown("""
 <style>
 /* Obsidian Observatory styling overrides */
-[data-testid="stSidebar"] { background-color: #1a1c1e; border-right: none !important; }
-.stApp { background-color: #121416; }
+[data-testid="stSidebar"] { background-color: #1a1c1e !important; border-right: none !important; }
+.stApp { background-color: #121416 !important; }
+.stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4, .stMarkdown h5, .stMarkdown h6 { color: #e2e2e5 !important; }
 div.block-container { padding-top: 3.5rem; }
 
 /* Dashboard Cards inside Risk Radar */
