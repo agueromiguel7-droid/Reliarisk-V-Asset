@@ -27,7 +27,16 @@ st.markdown("""
 /* Obsidian Observatory styling overrides */
 [data-testid="stSidebar"] { background-color: #1a1c1e !important; border-right: none !important; }
 .stApp { background-color: #121416 !important; }
-.stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4, .stMarkdown h5, .stMarkdown h6 { color: #e2e2e5 !important; }
+/* Universal font color fix to prevent dark-on-dark invisible text in default Light theme */
+html, body, [class*="css"], [class*="st-"], p, h1, h2, h3, h4, h5, h6, span, label, div {
+    color: #e2e2e5 !important;
+}
+/* Re-fix interactive backgrounds clashing with white font */
+div[data-baseweb="input"] > div, div[data-baseweb="select"] > div {
+    background-color: #1a1c1e !important;
+    border: 1px solid #4a5568 !important;
+}
+input, .stSelectbox div[role="combobox"] { color: #e2e2e5 !important; }
 div.block-container { padding-top: 3.5rem; }
 
 /* Dashboard Cards inside Risk Radar */
