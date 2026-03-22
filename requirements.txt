@@ -5,4 +5,3 @@ streamlit-authenticator
 plotly
 pydeck
 st-gsheets-connection
-bcrypt
