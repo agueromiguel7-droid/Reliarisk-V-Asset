@@ -109,16 +109,19 @@ if authenticate_user():
     
     df = load_data()
     
-    if page == get_text("nav_portfolio"):
-        render_portfolio(df)
-    elif page == get_text("nav_screener"):
-        render_screener(df)
-    elif page == get_text("nav_radar"):
-        render_detail_risk(df)
-    elif page == get_text("nav_sensitivity"):
-        render_sensitivity(df)
-    elif page == get_text("nav_admin"):
-        render_admin(df)
+    if df is not None:
+        if page == get_text("nav_portfolio"):
+            render_portfolio(df)
+        elif page == get_text("nav_screener"):
+            render_screener(df)
+        elif page == get_text("nav_radar"):
+            render_detail_risk(df)
+        elif page == get_text("nav_sensitivity"):
+            render_sensitivity(df)
+        elif page == get_text("nav_admin"):
+            render_admin(df)
+    else:
+        st.error("Error Crítico: No se pudo conectar a Google Sheets y no existe archivo de respaldo local.")
         
     # 5. --- Help Section ---
     st.sidebar.markdown("<br/>"*2, unsafe_allow_html=True)
