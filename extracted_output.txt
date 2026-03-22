@@ -1,0 +1,74 @@
+
+--- EXCEL SCHEMA ---
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 63 entries, 0 to 62
+Data columns (total 25 columns):
+ #   Column       Non-Null Count  Dtype  
+---  ------       --------------  -----  
+ 0   Unnamed: 0   0 non-null      float64
+ 1   Unnamed: 1   62 non-null     object 
+ 2   Unnamed: 2   61 non-null     object 
+ 3   Unnamed: 3   61 non-null     object 
+ 4   Unnamed: 4   61 non-null     object 
+ 5   Unnamed: 5   61 non-null     object 
+ 6   Unnamed: 6   61 non-null     object 
+ 7   Unnamed: 7   61 non-null     object 
+ 8   Unnamed: 8   61 non-null     object 
+ 9   Unnamed: 9   61 non-null     object 
+ 10  Unnamed: 10  61 non-null     object 
+ 11  Unnamed: 11  61 non-null     object 
+ 12  Unnamed: 12  61 non-null     object 
+ 13  Unnamed: 13  60 non-null     object 
+ 14  Unnamed: 14  61 non-null     object 
+ 15  Unnamed: 15  61 non-null     object 
+ 16  Unnamed: 16  61 non-null     object 
+ 17  Unnamed: 17  61 non-null     object 
+ 18  Unnamed: 18  61 non-null     object 
+ 19  Unnamed: 19  62 non-null     object 
+ 20  Unnamed: 20  61 non-null     object 
+ 21  Unnamed: 21  61 non-null     object 
+ 22  Unnamed: 22  61 non-null     object 
+ 23  Unnamed: 23  61 non-null     object 
+ 24  Unnamed: 24  61 non-null     object 
+dtypes: float64(1), object(24)
+memory usage: 12.4+ KB
+
+--- EXCEL HEAD ---
+   Unnamed: 0                           Unnamed: 1 Unnamed: 2                 Unnamed: 3               Unnamed: 4                Unnamed: 5                 Unnamed: 6                              Unnamed: 7              Unnamed: 8             Unnamed: 9            Unnamed: 10  Unnamed: 11             Unnamed: 12               Unnamed: 13            Unnamed: 14      Unnamed: 15          Unnamed: 16 Unnamed: 17                  Unnamed: 18                Unnamed: 19 Unnamed: 20                                     Unnamed: 21                                         Unnamed: 22  Unnamed: 23                                         Unnamed: 24
+0         NaN  Base de Datos de Campos de San Tomé        NaN                        NaN                      NaN                       NaN                        NaN                                     NaN                     NaN                    NaN                    NaN          NaN                     NaN                       NaN                    NaN              NaN                  NaN         NaN                          NaN                        NaN         NaN                                             NaN                                                 NaN          NaN                                                 NaN
+1         NaN                                  NaN        NaN                        NaN                      NaN                       NaN                        NaN                                     NaN                     NaN                    NaN                    NaN          NaN                     NaN                       NaN                    NaN              NaN                  NaN         NaN                          NaN       % de Liviano-Mediano         NaN                                             NaN                                                 NaN          NaN                                                 NaN
+2         NaN                                   N°     Campos                     Bloque       Tipo de Desarrollo  Res. Rem. de liq. (MMBN)  Res. Rem. de gas. (MMMPC)  Reserva de Petróleo equivalente (MMBN)  Iny. acum. gas (MMMPC)  Prod. acum. liq. (BN)  Prod. acum. gas (MPC)  RGP (pc/Bn)  Producción Actual (BD)  Producción Actual (Mpcd)  Pozos Categoria 2 y 3   Gravedad API.p  Gravedad Esp. Gas.p     K (mD)p  Prof. plano de ref. (pbnm)p  Hidrocarburo predominante  Mayor % de  Disponibilidad de Recurso Humano Especializado                                     Infraestructura  Inseguridad  Madurez de Tecnología para Desarrollo del Proyecto
+3         NaN                                    1     ELOTES  Bloque Budare_Isla_Elotes  CPP. (LNG Energy Group)                131.396246                 669.360736                              246.803269               24.992963             127.030365             186.370017  5094.215066                     351                      1943                    109        32.952344             0.761986  688.198864                  3761.584071                    0.92371       L y M                                           Media                            Req. Lp, Ductos para Op.        Media                                                Baja
+4         NaN                                    2     BUDARE  Bloque Budare_Isla_Elotes  CPP. (LNG Energy Group)                125.138608                 377.349403                               190.19885                  20.314             171.887931             149.462674  3015.451498                     500                         0                     83        29.353488              0.80935  500.808743                  2865.191257                   0.998208       L y M                                            Baja  Req. LP, Ductos para Transporte y Comercialización         Meia                                                Baja
+--- DOCX CONTENT ---
+📋 Especificaciones Técnicas para Google Antigravity
+1. El Objetivo del Proyecto
+"Desarrollar una Web App de Inteligencia de Negocios para la evaluación de 60 campos petroleros en Venezuela. El propósito es permitir a inversionistas identificar objetivos de inversión mediante análisis comparativo de datos técnicos, financieros y de riesgo."
+2. Stack Tecnológico Requerido
+Lenguaje: Python 3.x.
+Framework de UI: Streamlit.
+Gestión de Datos: Pandas para procesamiento en memoria / SQLAlchemy para conexión a base de datos.
+Seguridad: Implementar streamlit-authenticator (basado en YAML o DB) para control de acceso por roles (Admin/Inversionista).
+Control de Versiones: Repositorio en GitHub.
+3. Modelo de Datos (Esquema de Variables)
+Indica a Antigravity que debe crear una estructura que soporte los siguientes grupos de datos:
+Identificación: Campo, Bloque, Tipo de Desarrollo.
+Reservas: Líquido (MMBN), Gas (MMMPC), Petróleo Equivalente (MMBN).
+Producción: Prod. Acumulada, RGP, Producción Actual (BD/Mpcd).
+Geología/Yacimiento: Gravedad API, Gravedad Esp. Gas, Permeabilidad (K), Profundidad de referencia.
+Factores de Riesgo: Disponibilidad de Recurso Humano, Infraestructura, Inseguridad, Madurez Tecnológica.
+4. Lógica de Visualización (Dashboards)
+Solicita que el código generado incluya estas vistas específicas:
+Vista de Portafolio: Un mapa interactivo (usando pydeck o folium) donde el tamaño de las burbujas represente las Reservas de Petróleo Equivalente.
+Análisis de Sensibilidad: Un "Cross-plot" interactivo donde el eje X sea el % de Hidrocarburo Liviano-Mediano y el eje Y sea la Producción Actual.
+Radar de Riesgo: Un gráfico de radar para cada campo que promedie: Infraestructura, Seguridad y Talento Humano.
+5. Funcionalidades de Usuario
+Módulo Admin: Formulario interactivo para añadir "Más campos" o "Más tipos de información" (columnas dinámicas).
+Exportación: Botón para generar reportes en PDF/Excel de los campos seleccionados por el inversionista.
+Filtros Globales: Filtros por Bloque, por rango de Gravedad API (Liviano/Mediano/Pesado) y por nivel de madurez tecnológica.
+🛡️ Instrucciones de Seguridad para el Código
+"Genera un módulo de gestión de secretos (st.secrets) para manejar las credenciales de la base de datos y las llaves de encriptación. El acceso debe estar restringido mediante un login inicial obligatorio antes de renderizar cualquier dato del sector petrolero." Esto lo podemos lograra como en el caso de otras aplicaciones que ya hemos desarrollado, apoyados en un documento de control en formato Google Sheet, y que guardaremos en Google Drive.
+💡 Recomendación de Impacto
+Para que el inversionista tome decisiones rápidas, podemos calcular automáticamente un "Score de Atractividad". Se Puede definir así:
+Score = (Reservas * 0.4) + (Infraestructura * 0.3) - (Inseguridad * 0.3)
+Este número simple permitirá ordenar los 60 campos de mayor a menor interés en un solo clic.
