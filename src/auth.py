@@ -71,7 +71,6 @@ def authenticate_user():
                     else:
                         st.error(get_text('auth_wrong'))
         
-        st.info(get_text('auth_tip'))
         return False
         
     return True

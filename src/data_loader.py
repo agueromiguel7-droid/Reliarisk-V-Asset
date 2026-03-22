@@ -13,7 +13,11 @@ def load_data(filepath="BD_Campos_San-Tome.xlsx"):
                 # Ensure we skip empty trailing rows if any exist in GSheets
                 df = df.dropna(how='all')
             except Exception as e:
-                st.warning(f"Advertencia (Service Account): {e}")
+                error_msg = str(e)
+                if "404" in error_msg:
+                    st.warning("⚠️ Sin acceso a Google Sheets (Error 404). Verifica que en tu archivo de Google Sheets le hayas dado click a 'Compartir' y pegado el 'client_email' de tu Service Account como Lector. (Mostrando datos locales de respaldo temporales).")
+                else:
+                    st.warning(f"Advertencia de Conexión: {e}")
                 df = pd.read_excel(filepath, header=0)
         else:
             df = pd.read_excel(filepath, header=0)
