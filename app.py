@@ -110,24 +110,22 @@ if authenticate_user():
     df = load_data()
     
     if df is not None:
-        # --- Global Area Filter ---
+        # --- Global Area Filter (Main Page) ---
         area_col = next((c for c in df.columns if 'Area' in c or 'Área' in c), None)
         if area_col:
-            st.sidebar.markdown("---")
-            st.sidebar.subheader(get_text("nav_filters", "Filtros Globales"))
+            st.markdown(f"#### 🌍 {get_text('filter_area', 'Seleccionar Área Operativa')}")
             area_list = sorted(list(df[area_col].dropna().unique()))
-            selected_area = st.sidebar.selectbox(
-                get_text("filter_area", "Seleccionar Área"),
+            selected_area = st.selectbox(
+                "Area_Global",
                 [get_text("all", "Todas")] + area_list,
-                key="global_area_filter"
+                key="global_area_filter",
+                label_visibility="collapsed"
             )
             if selected_area != get_text("all", "Todas"):
                 df = df[df[area_col] == selected_area].reset_index(drop=True)
-        
-        st.sidebar.markdown("---")
+            st.markdown("<hr style='margin-top: 5px; margin-bottom: 25px; border-color: #333;'/>", unsafe_allow_html=True)
         
         if page == get_text("nav_portfolio"):
-
             render_portfolio(df)
         elif page == get_text("nav_screener"):
             render_screener(df)
