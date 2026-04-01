@@ -144,6 +144,9 @@ def render_portfolio(df):
         # Pre-calculate top fields
         ranking_df = df.sort_values('STARIV', ascending=False).head(15).copy()
         
+        # Identify Ventaja Estratégica column
+        ventaja_col = next((c for c in df.columns if 'Ventaja' in c and 'Inversor' in c or 'Ventaja Estratégica' in c or 'Ventaja Estrategica' in c), None)
+        
         rank_col, graph_col = st.columns([1.5, 2.5])
         
         with rank_col:
@@ -161,16 +164,28 @@ def render_portfolio(df):
                 cls = "rank-gold" if i==0 else "rank-silver" if i==1 else "rank-bronze" if i==2 else ""
                 riesgo_val = row.get('Nivel de Riesgo', 'N/A')
                 riesgo_fmt = f"{riesgo_val:.2f}" if isinstance(riesgo_val, (int, float)) else riesgo_val
+                
+                ventaja_text = ""
+                if ventaja_col:
+                    v_text = str(row.get(ventaja_col, ''))
+                    if v_text and v_text != 'nan' and v_text != 'None':
+                        ventaja_text = f"<br/><small style='color:#a0aab2; font-style:italic; font-size: 0.70rem; line-height: 1.2; display: inline-block; margin-top:4px;'>💡 {v_text}</small>"
+                
                 st.markdown(f"""
                 <div class="rank-item {cls}">
                     <span style="font-weight:bold; color:#81cfff">#{i+1}</span> {row.get(campo_col, '')} <br/>
                     <small style="color:#b2b9c1">STARIV: <b>{row.get('STARIV', 0):.4f}</b> | Riesgo: {riesgo_fmt}</small>
+                    {ventaja_text}
                 </div>
                 """, unsafe_allow_html=True)
 
         with graph_col:
             # Chart for STARIV Ranking
             import plotly.express as px
+            hover_dict = {}
+            if ventaja_col:
+                hover_dict[ventaja_col] = True
+                
             fig = px.bar(
                 ranking_df, 
                 x='STARIV', 
@@ -178,6 +193,7 @@ def render_portfolio(df):
                 orientation='h',
                 title=get_text('scr_rank_chart', "Ranking de Atractividad STARIV"),
                 color='STARIV',
+                hover_data=hover_dict,
                 color_continuous_scale='Blues',
                 template='plotly_dark'
             )
