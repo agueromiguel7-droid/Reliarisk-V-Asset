@@ -157,12 +157,14 @@ def render_portfolio(df):
             </style>
             """, unsafe_allow_html=True)
             
-            for i, row in enumerate(ranking_df.itertuples()):
+            for i, row in enumerate(ranking_df.to_dict('records')):
                 cls = "rank-gold" if i==0 else "rank-silver" if i==1 else "rank-bronze" if i==2 else ""
+                riesgo_val = row.get('Nivel de Riesgo', 'N/A')
+                riesgo_fmt = f"{riesgo_val:.2f}" if isinstance(riesgo_val, (int, float)) else riesgo_val
                 st.markdown(f"""
                 <div class="rank-item {cls}">
-                    <span style="font-weight:bold; color:#81cfff">#{i+1}</span> {row.Campos} <br/>
-                    <small style="color:#b2b9c1">STARIV: <b>{row.STARIV:.4f}</b> | Riesgo: {row._29 if hasattr(row, 'Nivel_de_Riesgo') else row._11 if hasattr(row, 'Nivel de Riesgo') else 'N/A'}</small>
+                    <span style="font-weight:bold; color:#81cfff">#{i+1}</span> {row.get(campo_col, '')} <br/>
+                    <small style="color:#b2b9c1">STARIV: <b>{row.get('STARIV', 0):.4f}</b> | Riesgo: {riesgo_fmt}</small>
                 </div>
                 """, unsafe_allow_html=True)
 
