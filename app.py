@@ -146,3 +146,28 @@ if authenticate_user():
     st.sidebar.markdown("<br/>"*2, unsafe_allow_html=True)
     with st.sidebar.expander(get_text("help_score_title")):
         st.markdown(get_text("help_score_text"))
+
+    # 6. --- Legal Disclaimer ---
+    disclaimer_html = """
+    <div style="margin-top: 50px;">
+        <details>
+            <summary style="font-size: 0.75rem; color: #7f8c8d; cursor: pointer; list-style-type: none;">
+                © 2026 Grupo Reliarisk. El uso de STARIV está sujeto al <a style="color: #95a5a6; text-decoration: underline;">Descargo de Responsabilidad</a>.
+            </summary>
+            <div style="font-size: 0.7rem; color: #7f8c8d; padding: 10px; margin-top: 5px; background-color: #1e2022; border-radius: 5px; text-align: justify; line-height: 1.4;">
+                <b>AVISO LEGAL Y LIMITACIÓN DE RESPONSABILIDAD – RELIARISK V-ASSET</b><br/><br/>
+                <b>1. Naturaleza de la Información:</b><br/>
+                Esta aplicación y los informes generados por ella son propiedad de Grupo Reliarisk y se proporcionan exclusivamente con fines informativos y de soporte a la toma de decisiones estratégicas. La información técnica, geográfica y de producción contenida en Reliarisk V-Asset proviene de fuentes públicas oficiales, registros históricos del Estado Venezolano (PDVSA/MinPetróleo) y bases de datos técnicas de la industria. Grupo Reliarisk no garantiza la exactitud, integridad o actualización en tiempo real de dicha data externa.<br/><br/>
+                <b>2. Proyecciones y Estimaciones Estocásticas:</b><br/>
+                Los indicadores como el Índice de Proximidad a Infraestructura (IPI), el Cuadro de Mando de Riesgos y el Resumen Ejecutivo Automático son el resultado de modelos algorítmicos y análisis de riesgo probabilístico. Estas proyecciones representan expectativas sobre eventos futuros y están sujetas a variables económicas, políticas, geológicas y operativas fuera del control de Grupo Reliarisk. Los resultados reales pueden variar significativamente de las estimaciones presentadas.<br/><br/>
+                <b>3. No Asesoría Financiera ni de Inversión:</b><br/>
+                El contenido de esta plataforma no constituye una oferta de venta, una solicitud de compra de activos petroleros, ni una recomendación formal de inversión. El usuario y/o potencial inversionista es el único responsable de realizar su propia debida diligencia (Due Diligence) técnica y legal antes de comprometer capital o recursos en los campos mencionados.<br/><br/>
+                <b>4. Confidencialidad y Uso de Datos:</b><br/>
+                Dado el carácter sensible de la información estratégica del sector hidrocarburos, el acceso a esta aplicación está restringido. El uso no autorizado, la reproducción total o parcial, o la divulgación de los mapas y dashboards de Reliarisk V-Asset a terceros sin el consentimiento expreso de Grupo Reliarisk está estrictamente prohibido y puede estar sujeto a sanciones legales.<br/><br/>
+                <b>5. Exclusión de Daños:</b><br/>
+                Bajo ninguna circunstancia Grupo Reliarisk, sus directivos o desarrolladores serán responsables por pérdidas financieras, daños directos o indirectos derivados del uso o la imposibilidad de uso de esta herramienta tecnológica.
+            </div>
+        </details>
+    </div>
+    """
+    st.sidebar.markdown(disclaimer_html, unsafe_allow_html=True)
