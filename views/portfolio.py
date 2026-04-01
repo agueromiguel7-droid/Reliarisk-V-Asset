@@ -16,7 +16,7 @@ def render_portfolio(df):
         dev_col = next((c for c in df.columns if 'Desarrollo' in c), None)
         inseg_col = next((c for c in df.columns if 'Inseguridad' in c), None)
         mat_col = next((c for c in df.columns if 'Madurez' in c or 'Tecnológica' in c), None)
-        
+        area_col = next((c for c in df.columns if 'Area' in c or 'Área' in c), None)
         campo_col = next((c for c in df.columns if 'Campos' in c), 'Campos')
         bloque_col = next((c for c in df.columns if 'Bloque' in c), None)
         
@@ -41,52 +41,7 @@ def render_portfolio(df):
             
         st.markdown("<br/>", unsafe_allow_html=True)
         
-        # --- Automatic Ranking Section ---
-        st.markdown(f"### 🏆 {get_text('scr_rank_title', 'Jerarquización de Campos (STARIV)')}")
-        
-        # Pre-calculate top fields
-        ranking_df = df.sort_values('STARIV', ascending=False).head(15).copy()
-        
-        rank_col, map_col = st.columns([1.5, 2.5])
-        
-        with rank_col:
-            # Custom CSS for leaderboard
-            st.markdown("""
-            <style>
-            .rank-item { padding: 10px; border-radius: 5px; margin-bottom: 5px; background: #1e2022; border-left: 5px solid #81cfff; }
-            .rank-gold { border-left: 5px solid #ffd700; background: #2a2d30; }
-            .rank-silver { border-left: 5px solid #c0c0c0; }
-            .rank-bronze { border-left: 5px solid #cd7f32; }
-            </style>
-            """, unsafe_allow_html=True)
-            
-            for i, row in enumerate(ranking_df.itertuples()):
-                cls = "rank-gold" if i==0 else "rank-silver" if i==1 else "rank-bronze" if i==2 else ""
-                st.markdown(f"""
-                <div class="rank-item {cls}">
-                    <span style="font-weight:bold; color:#81cfff">#{i+1}</span> {row.Campos} <br/>
-                    <small style="color:#b2b9c1">STARIV: <b>{row.STARIV:.4f}</b> | Riesgo: {row._29 if hasattr(row, 'Nivel_de_Riesgo') else row._11 if hasattr(row, 'Nivel de Riesgo') else 'N/A'}</small>
-                </div>
-                """, unsafe_allow_html=True)
-
-        with map_col:
-            # Chart for STARIV Ranking
-            import plotly.express as px
-            fig = px.bar(
-                ranking_df, 
-                x='STARIV', 
-                y=campo_col, 
-                orientation='h',
-                title=get_text('scr_rank_chart', "Ranking de Atractividad STARIV"),
-                color='STARIV',
-                color_continuous_scale='Blues',
-                template='plotly_dark'
-            )
-            fig.update_layout(yaxis={'categoryorder':'total ascending'})
-            st.plotly_chart(fig, use_container_width=True)
-
-        st.markdown("<hr/>", unsafe_allow_html=True)
-        
+        # === MAP AND FILTERS (NEW ORDER: MAP FIRST) ===
         map_view_col, filter_tab_col = st.columns([3, 1])
         
         with filter_tab_col:
@@ -182,6 +137,54 @@ def render_portfolio(df):
                 st.warning(get_text('port_no_col_coord'))
 
         st.markdown("<hr/>", unsafe_allow_html=True)
+        
+        # === RANKING SECTION (STARIV) ===
+        st.markdown(f"### 🏆 {get_text('scr_rank_title', 'Jerarquización de Campos (STARIV)')}")
+        
+        # Pre-calculate top fields
+        ranking_df = df.sort_values('STARIV', ascending=False).head(15).copy()
+        
+        rank_col, graph_col = st.columns([1.5, 2.5])
+        
+        with rank_col:
+            # Custom CSS for leaderboard
+            st.markdown("""
+            <style>
+            .rank-item { padding: 10px; border-radius: 5px; margin-bottom: 5px; background: #1e2022; border-left: 5px solid #81cfff; }
+            .rank-gold { border-left: 5px solid #ffd700; background: #2a2d30; }
+            .rank-silver { border-left: 5px solid #c0c0c0; }
+            .rank-bronze { border-left: 5px solid #cd7f32; }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            for i, row in enumerate(ranking_df.itertuples()):
+                cls = "rank-gold" if i==0 else "rank-silver" if i==1 else "rank-bronze" if i==2 else ""
+                st.markdown(f"""
+                <div class="rank-item {cls}">
+                    <span style="font-weight:bold; color:#81cfff">#{i+1}</span> {row.Campos} <br/>
+                    <small style="color:#b2b9c1">STARIV: <b>{row.STARIV:.4f}</b> | Riesgo: {row._29 if hasattr(row, 'Nivel_de_Riesgo') else row._11 if hasattr(row, 'Nivel de Riesgo') else 'N/A'}</small>
+                </div>
+                """, unsafe_allow_html=True)
+
+        with graph_col:
+            # Chart for STARIV Ranking
+            import plotly.express as px
+            fig = px.bar(
+                ranking_df, 
+                x='STARIV', 
+                y=campo_col, 
+                orientation='h',
+                title=get_text('scr_rank_chart', "Ranking de Atractividad STARIV"),
+                color='STARIV',
+                color_continuous_scale='Blues',
+                template='plotly_dark'
+            )
+            fig.update_layout(yaxis={'categoryorder':'total ascending'})
+            st.plotly_chart(fig, use_container_width=True)
+
+
+        st.markdown("<hr/>", unsafe_allow_html=True)
+        # === MATRIX SECTION ===
         st.markdown(f"### {get_text('port_matrix')}")
         st.caption(get_text('port_matrix_cap'))
         
