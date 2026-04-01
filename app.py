@@ -57,9 +57,30 @@ if 'language' not in st.session_state:
 
 if authenticate_user():
     
+    df = load_data()
+
     # === Top Navigation Bar ===
-    top_empty, top_col_user, top_col_lang, top_col_out = st.columns([10, 3, 1.2, 1.8])
+    top_col_filter, top_col_user, top_col_lang, top_col_out = st.columns([5, 3, 1.2, 1.8])
     
+    with top_col_filter:
+        if df is not None:
+            area_col = next((c for c in df.columns if 'Area' in c or 'Área' in c), None)
+            if area_col:
+                area_list = sorted(list(df[area_col].dropna().unique()))
+                st.markdown(
+                    "<div style='padding-top:2px;'></div>", 
+                    unsafe_allow_html=True
+                )
+                selected_area = st.selectbox(
+                    f"🌍 {get_text('filter_area', 'Seleccionar Área Operativa')}",
+                    [get_text("all", "Todas")] + area_list,
+                    key="global_area_filter",
+                    label_visibility="collapsed"
+                )
+                if selected_area != get_text("all", "Todas"):
+                    df = df[df[area_col] == selected_area].reset_index(drop=True)
+                    df = recalculate_stariv(df)
+                    
     with top_col_user:
         role_label = "Admin" if st.session_state.get('role', 'inversor') == 'admin' else "Inv"
         st.markdown(f"<div style='text-align: right; padding-top: 5px; color: #b2b9c1; font-size: 1.1rem; white-space: nowrap;'>👤 <b>{st.session_state.get('username')}</b> ({role_label})</div>", unsafe_allow_html=True)
@@ -107,25 +128,7 @@ if authenticate_user():
         
     page = st.sidebar.radio("Ir a / Go to", pages)
     
-    df = load_data()
-    
     if df is not None:
-        # --- Global Area Filter (Main Page) ---
-        area_col = next((c for c in df.columns if 'Area' in c or 'Área' in c), None)
-        if area_col:
-            st.markdown(f"#### 🌍 {get_text('filter_area', 'Seleccionar Área Operativa')}")
-            area_list = sorted(list(df[area_col].dropna().unique()))
-            selected_area = st.selectbox(
-                "Area_Global",
-                [get_text("all", "Todas")] + area_list,
-                key="global_area_filter",
-                label_visibility="collapsed"
-            )
-            if selected_area != get_text("all", "Todas"):
-                df = df[df[area_col] == selected_area].reset_index(drop=True)
-                df = recalculate_stariv(df)
-            st.markdown("<hr style='margin-top: 5px; margin-bottom: 25px; border-color: #333;'/>", unsafe_allow_html=True)
-        
         if page == get_text("nav_portfolio"):
             render_portfolio(df)
         elif page == get_text("nav_screener"):

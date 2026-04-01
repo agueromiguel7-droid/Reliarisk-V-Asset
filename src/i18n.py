@@ -220,5 +220,16 @@ def translate_columns(df):
                         break
                 new_cols.append(match if match else c)
                 
-        df.columns = new_cols
+        # Deduplicate column names to prevent PyArrow serialization errors
+        counts = {}
+        unique_cols = []
+        for col in new_cols:
+            if col in counts:
+                counts[col] += 1
+                unique_cols.append(f"{col} ({counts[col]})")
+            else:
+                counts[col] = 0
+                unique_cols.append(col)
+                
+        df.columns = unique_cols
     return df
