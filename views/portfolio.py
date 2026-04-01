@@ -23,39 +23,73 @@ def render_portfolio(df):
         # Calculate KPIs based on current DF
         tot_res_val = pd.to_numeric(df[reserva_col], errors='coerce').sum() if reserva_col else 0
         tot_prod_val = pd.to_numeric(df[prod_col], errors='coerce').sum() if prod_col else 0
-        avg_api_val = pd.to_numeric(df[api_col], errors='coerce').mean() if api_col else 0
         
-        c1, c2, c3 = st.columns(3)
+        # Robust API min/max handling to fix the reported error
+        api_series = pd.to_numeric(df[api_col], errors='coerce') if api_col else pd.Series([])
+        avg_api_val = api_series.mean() if not api_series.empty else 0
+        
+        c1, c2, c3, c4 = st.columns(4)
         with c1:
             st.metric(get_text('port_tot_res'), f"{tot_res_val:,.1f} MMBN")
         with c2:
             st.metric(get_text('port_tot_prod'), f"{tot_prod_val:,.1f} BD")
         with c3:
             st.metric(get_text('port_avg_api'), f"{avg_api_val:,.1f}° API")
+        with c4:
+            avg_stariv = df['STARIV'].mean() if 'STARIV' in df.columns else 0
+            st.metric(get_text('idx_stariv', "Índice STARIV"), f"{avg_stariv:.3f}")
             
         st.markdown("<br/>", unsafe_allow_html=True)
         
-        map_col, filter_col = st.columns([3, 1])
+        # --- Automatic Ranking Section ---
+        st.markdown(f"### 🏆 {get_text('scr_rank_title', 'Jerarquización de Campos (STARIV)')}")
         
-        with filter_col:
-            st.markdown(f"""
-            <div style="background-color: #1e2022; padding: 15px; border-radius: 8px; margin-bottom: 25px;">
-                <div style="font-size: 0.75rem; font-weight: 700; color: #b2b9c1; margin-bottom: 12px; font-family: 'Inter', sans-serif;">{get_text('port_res_scale')}</div>
-                <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                    <div style="width: 18px; height: 18px; border-radius: 50%; background-color: rgba(0, 90, 156, 0.6); border: 2px solid #81cfff; margin-right: 15px;"></div>
-                    <span style="font-size: 0.9rem; color: #e2e2e5; font-family: 'Inter', sans-serif;">> 1,000 MMBN</span>
-                </div>
-                <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                    <div style="width: 12px; height: 12px; border-radius: 50%; background-color: rgba(0, 90, 156, 0.6); border: 2px solid #81cfff; margin-right: 18px; margin-left: 3px;"></div>
-                    <span style="font-size: 0.9rem; color: #e2e2e5; font-family: 'Inter', sans-serif;">500 - 1,000</span>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <div style="width: 8px; height: 8px; border-radius: 50%; background-color: rgba(0, 90, 156, 0.6); border: 2px solid #81cfff; margin-right: 20px; margin-left: 5px;"></div>
-                    <span style="font-size: 0.9rem; color: #e2e2e5; font-family: 'Inter', sans-serif;">< 500 MMBN</span>
-                </div>
-            </div>
+        # Pre-calculate top fields
+        ranking_df = df.sort_values('STARIV', ascending=False).head(15).copy()
+        
+        rank_col, map_col = st.columns([1.5, 2.5])
+        
+        with rank_col:
+            # Custom CSS for leaderboard
+            st.markdown("""
+            <style>
+            .rank-item { padding: 10px; border-radius: 5px; margin-bottom: 5px; background: #1e2022; border-left: 5px solid #81cfff; }
+            .rank-gold { border-left: 5px solid #ffd700; background: #2a2d30; }
+            .rank-silver { border-left: 5px solid #c0c0c0; }
+            .rank-bronze { border-left: 5px solid #cd7f32; }
+            </style>
             """, unsafe_allow_html=True)
             
+            for i, row in enumerate(ranking_df.itertuples()):
+                cls = "rank-gold" if i==0 else "rank-silver" if i==1 else "rank-bronze" if i==2 else ""
+                st.markdown(f"""
+                <div class="rank-item {cls}">
+                    <span style="font-weight:bold; color:#81cfff">#{i+1}</span> {row.Campos} <br/>
+                    <small style="color:#b2b9c1">STARIV: <b>{row.STARIV:.4f}</b> | Riesgo: {row._29 if hasattr(row, 'Nivel_de_Riesgo') else row._11 if hasattr(row, 'Nivel de Riesgo') else 'N/A'}</small>
+                </div>
+                """, unsafe_allow_html=True)
+
+        with map_col:
+            # Chart for STARIV Ranking
+            import plotly.express as px
+            fig = px.bar(
+                ranking_df, 
+                x='STARIV', 
+                y=campo_col, 
+                orientation='h',
+                title=get_text('scr_rank_chart', "Ranking de Atractividad STARIV"),
+                color='STARIV',
+                color_continuous_scale='Blues',
+                template='plotly_dark'
+            )
+            fig.update_layout(yaxis={'categoryorder':'total ascending'})
+            st.plotly_chart(fig, use_container_width=True)
+
+        st.markdown("<hr/>", unsafe_allow_html=True)
+        
+        map_view_col, filter_tab_col = st.columns([3, 1])
+        
+        with filter_tab_col:
             st.markdown(f"#### {get_text('port_filters')}")
             
             # Master field filter
@@ -70,18 +104,22 @@ def render_portfolio(df):
             
             with tab_tech:
                 if api_col:
-                    min_api = float(df[api_col].min(skipna=True))
-                    max_api = float(df[api_col].max(skipna=True))
-                    if not pd.isna(min_api) and not pd.isna(max_api) and min_api < max_api:
-                        sel_api = st.slider(get_text("filter_api"), min_api, max_api, (min_api, max_api))
-                        df = df[(df[api_col] >= sel_api[0]) & (df[api_col] <= sel_api[1]) | df[api_col].isna()]
+                    api_clean = pd.to_numeric(df[api_col], errors='coerce').dropna()
+                    if not api_clean.empty:
+                        min_api = float(api_clean.min())
+                        max_api = float(api_clean.max())
+                        if min_api < max_api:
+                            sel_api = st.slider(get_text("filter_api"), min_api, max_api, (min_api, max_api))
+                            df = df[(pd.to_numeric(df[api_col], errors='coerce') >= sel_api[0]) & (pd.to_numeric(df[api_col], errors='coerce') <= sel_api[1]) | df[api_col].isna()]
                 
                 if depth_col:
-                    min_depth = float(df[depth_col].min(skipna=True))
-                    max_depth = float(df[depth_col].max(skipna=True))
-                    if not pd.isna(min_depth) and not pd.isna(max_depth) and min_depth < max_depth:
-                        sel_depth = st.slider(get_text("filter_depth"), min_depth, max_depth, (min_depth, max_depth))
-                        df = df[(df[depth_col] >= sel_depth[0]) & (df[depth_col] <= sel_depth[1]) | df[depth_col].isna()]
+                    depth_clean = pd.to_numeric(df[depth_col], errors='coerce').dropna()
+                    if not depth_clean.empty:
+                        min_depth = float(depth_clean.min())
+                        max_depth = float(depth_clean.max())
+                        if min_depth < max_depth:
+                            sel_depth = st.slider(get_text("filter_depth"), min_depth, max_depth, (min_depth, max_depth))
+                            df = df[(pd.to_numeric(df[depth_col], errors='coerce') >= sel_depth[0]) & (pd.to_numeric(df[depth_col], errors='coerce') <= sel_depth[1]) | df[depth_col].isna()]
                         
                 if dev_col:
                     dev_opts = df[dev_col].dropna().unique()
@@ -91,25 +129,19 @@ def render_portfolio(df):
                             df = df[df[dev_col].isin(sel_dev)]
                             
             with tab_risk:
-                if inseg_col:
-                    inseg_opts = sorted(list(df[inseg_col].dropna().unique()))
-                    if len(inseg_opts) > 0:
-                        sel_inseg = st.multiselect(get_text("filter_insecurity"), inseg_opts, default=[])
-                        if sel_inseg:
-                            df = df[df[inseg_col].isin(sel_inseg)]
-                            
-                if mat_col:
-                    mat_opts = df[mat_col].dropna().unique()
-                    if len(mat_opts) > 0:
-                        sel_mat = st.multiselect(get_text("filter_tech_mat"), mat_opts, default=[])
-                        if sel_mat:
-                            df = df[df[mat_col].isin(sel_mat)]
-            
+                risk_col_name = 'Nivel de Riesgo'
+                if risk_col_name in df.columns:
+                    min_r = float(df[risk_col_name].min())
+                    max_r = float(df[risk_col_name].max())
+                    if min_r < max_r:
+                        sel_risk = st.slider(get_text("idx_risk"), min_r, max_r, (min_r, max_r))
+                        df = df[(df[risk_col_name] >= sel_risk[0]) & (df[risk_col_name] <= sel_risk[1])]
+
             st.markdown("<br/>", unsafe_allow_html=True)
             if st.button(get_text('port_export'), use_container_width=True):
                 st.info(get_text('port_export_msg'))
                 
-        with map_col:
+        with map_view_col:
             if 'Latitud' in df.columns and 'Longitud' in df.columns:
                 df['Latitud'] = pd.to_numeric(df['Latitud'], errors='coerce')
                 df['Longitud'] = pd.to_numeric(df['Longitud'], errors='coerce')
@@ -117,14 +149,14 @@ def render_portfolio(df):
                 
                 if not map_df.empty:
                     if reserva_col:
-                        map_df['radius'] = np.sqrt(pd.to_numeric(map_df[reserva_col], errors='coerce').fillna(1)) * 250
+                        map_df['radius'] = np.sqrt(pd.to_numeric(map_df[reserva_col], errors='coerce').fillna(1)) * 300
                     else:
                         map_df['radius'] = 1000
     
                     view_state = pdk.ViewState(
                         latitude=map_df['Latitud'].mean(),
                         longitude=map_df['Longitud'].mean(),
-                        zoom=7,
+                        zoom=6.5,
                         pitch=0
                     )
                     
@@ -133,7 +165,7 @@ def render_portfolio(df):
                         data=map_df,
                         get_position='[Longitud, Latitud]',
                         get_radius='radius',
-                        get_fill_color='[0, 90, 156, 160]',
+                        get_fill_color='[0, 145, 255, 160]',
                         pickable=True,
                         auto_highlight=True
                     )
@@ -142,7 +174,7 @@ def render_portfolio(df):
                         map_style='dark',
                         initial_view_state=view_state,
                         layers=[layer],
-                        tooltip={"text": "{Campos}\nScore: {Score de Atractividad}"}
+                        tooltip={"text": "{Campos}\nSTARIV: {STARIV}"}
                     ))
                 else:
                     st.warning(get_text('port_no_coord'))
@@ -153,15 +185,16 @@ def render_portfolio(df):
         st.markdown(f"### {get_text('port_matrix')}")
         st.caption(get_text('port_matrix_cap'))
         
-        display_cols = [c for c in [campo_col, bloque_col, reserva_col, prod_col, api_col, dev_col, 'Detalle Tipo de Desarrollo', 'Score de Atractividad'] if c in df.columns]
+        display_cols = [c for c in [campo_col, area_col, 'STARIV', 'Nivel de Riesgo', reserva_col, prod_col, api_col, dev_col] if c in df.columns]
         if display_cols:
             display_df = translate_columns(df[display_cols].copy())
             
             numeric_cols = display_df.select_dtypes(include=['number']).columns
-            style_dict = {col: "{:,.2f}" for col in numeric_cols}
+            style_dict = {col: "{:,.3f}" if 'STARIV' in str(col) else "{:,.2f}" for col in numeric_cols}
             
             styled_df = display_df.style.format(style_dict)
             st.dataframe(styled_df, use_container_width=True, hide_index=True)
+
 
     else:
         st.warning(get_text('port_no_data'))

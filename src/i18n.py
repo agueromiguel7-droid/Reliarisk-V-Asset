@@ -72,8 +72,13 @@ translations = {
         "adm_succ": "Database successfully updated. Reloading...",
         "adm_err": "Error updating database: ",
         "score_label": "Attractiveness Score",
-        "help_score_title": "ℹ️ About Attractiveness Score",
-        "help_score_text": "The **Attractiveness Score** is a dynamic indicator calculated to rank investment opportunities across multiple axes.\n\n**Calculation Formula:**\n`Score = (Reserves * 0.4) + (Infrastructure * 0.3) - (Insecurity * 0.3)`\n\n*Where non-numerical risk data (High/Med/Low) is converted into an analytical range.*"
+        "help_score_title": "ℹ️ About STARIV & Risk Index",
+        "help_score_text": "The **STARIV** (Strategic Technical Asset Risk & Investment Value) is a multi-criteria index that ranks fields based on profitability and risk.\n\n**STARIV Formula:**\n`STARIV = (Good Criteria + 1) / (Bad Criteria + 1)`\n\n*Where 'Good' includes Reserves, Production, Wells and API; and 'Bad' includes GOR and Risk.*",
+        "nav_filters": "Global Filters",
+        "filter_area": "Select Area",
+        "all": "All",
+        "idx_stariv": "STARIV Index",
+        "idx_risk": "Risk Level Index"
     },
     "Español": {
         "nav_title": "Navegación",
@@ -146,14 +151,20 @@ translations = {
         "adm_succ": "Base de datos actualizada correctamente. Recargando...",
         "adm_err": "Error al actualizar la base de datos: ",
         "score_label": "Score de Atractividad",
-        "help_score_title": "ℹ️ Sobre el Score de Atractividad",
-        "help_score_text": "El **Score de Atractividad** es un indicador calculado que permite jerarquizar velozmente las oportunidades bajo múltiples criterios.\n\n**Fórmula de cálculo base:**\n`Score = (Reservas * 0.4) + (Infraestructura * 0.3) - (Inseguridad * 0.3)`\n\n*Nota: Los valores categóricos de riesgo (Alta, Media, Baja) se mapean numéricamente tras bastidores.*"
+        "help_score_title": "ℹ️ Sobre STARIV e Índice de Riesgo",
+        "help_score_text": "El **STARIV** (Strategic Technical Asset Risk & Investment Value) es un índice multicriterio que jerarquiza campos basándose en rentabilidad y riesgo.\n\n**Fórmula STARIV:**\n`STARIV = (Criterios Positivos + 1) / (Criterios Negativos + 1)`\n\n*Donde los 'Positivos' incluyen Reservas, Producción, Pozos y API; y los 'Negativos' incluyen RGP y Riesgo.*",
+        "nav_filters": "Filtros Globales",
+        "filter_area": "Seleccionar Área",
+        "all": "Todas",
+        "idx_stariv": "Índice STARIV",
+        "idx_risk": "Nivel de Riesgo"
     }
 }
 
-def get_text(key):
+def get_text(key, default=None):
     lang = st.session_state.get('language', 'Español')
-    return translations.get(lang, translations['Español']).get(key, key)
+    res = translations.get(lang, translations['Español']).get(key, default if default else key)
+    return res
 
 def translate_columns(df):
     """Dynamically rename dataframe columns if English is selected."""

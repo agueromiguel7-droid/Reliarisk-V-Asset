@@ -9,64 +9,49 @@ def render_screener(df):
     if df is not None and not df.empty:
         # Define sorting options dynamically
         sort_options_base = [
-            'Score de Atractividad',
+            'STARIV',
+            'Nivel de Riesgo',
             'Reservas Remanentes Líquido',
             'Reservas Remanentes Gas',
             'Reservas Remanentes Petróleo Equivalente',
             'Producción Actual',
             'Pozos Categoria 2 y 3',
-            'Gravedad API',
-            'Profundidad plano de ref.'
+            'Gravedad API'
         ]
         
         available_sort_cols = []
         col_mapping = {}
         for opt in sort_options_base:
-            words = opt.replace("ó", "o").replace("í", "i").lower().split()
+            # Map column names flexibly
             best_col = None
-            for c in df.columns:
-                c_clean = c.replace("ó", "o").replace("í", "i").lower()
-                if all(w[:4] in c_clean for w in words): 
-                    best_col = c
-                    break
-            if not best_col:
-                keyword = words[0] if words else ''
+            if opt in df.columns:
+                best_col = opt
+            else:
+                words = opt.replace("ó", "o").replace("í", "i").lower().split()
                 for c in df.columns:
-                    if keyword in c.lower() and ('api' in opt.lower() and 'api' in c.lower() or 'api' not in opt.lower()):
+                    c_clean = str(c).replace("ó", "o").replace("í", "i").lower()
+                    if all(w[:4] in c_clean for w in words): 
                         best_col = c
                         break
-                        
-            if not best_col and opt in df.columns:
-                best_col = opt
-                
+            
             if best_col and best_col not in col_mapping.values():
-                col_mapping[opt] = best_col
-                # For UI display in dropdown, optionally translate the option:
                 opt_display = opt
                 if st.session_state.get('language') == "English":
-                    # Ad-hoc translations for drop-down
                     en_dict = {
-                        'Score de Atractividad': 'Attractiveness Score',
+                        'STARIV': 'STARIV Index',
+                        'Nivel de Riesgo': 'Risk Level',
                         'Reservas Remanentes Líquido': 'Liquid Reserves',
                         'Reservas Remanentes Gas': 'Gas Reserves',
                         'Reservas Remanentes Petróleo Equivalente': 'Eq. Oil Reserves',
                         'Producción Actual': 'Current Production',
                         'Pozos Categoria 2 y 3': 'Cat 2 & 3 Wells',
-                        'Gravedad API': 'API Gravity',
-                        'Profundidad plano de ref.': 'Ref. Depth'
+                        'Gravedad API': 'API Gravity'
                     }
                     opt_display = en_dict.get(opt, opt)
                 
-                # Bi-directional tracking
                 col_mapping[opt_display] = best_col
                 available_sort_cols.append(opt_display)
-                
-        # Also always safely include 'Score'
-        if 'Score de Atractividad' in df.columns:
-            sc_key = 'Attractiveness Score' if st.session_state.get('language') == "English" else 'Score de Atractividad'
-            if sc_key not in available_sort_cols:
-                col_mapping[sc_key] = 'Score de Atractividad'
-                available_sort_cols.insert(0, sc_key)
+
 
         col1, _ = st.columns([1, 2])
         with col1:

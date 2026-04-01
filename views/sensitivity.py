@@ -25,19 +25,22 @@ def render_sensitivity(df):
             
             plot_df = df.dropna(subset=[x_col, y_col]).copy()
             
-            # Bubble Size handling based on Score
-            if 'Score de Atractividad' in plot_df.columns:
-                # size must be strictly positive
-                plot_df['bubble_size'] = plot_df['Score de Atractividad'].apply(lambda x: max(0.5, float(x)))
+            # Bubble Size handling based on STARIV
+            score_col = 'STARIV' if 'STARIV' in plot_df.columns else 'Score de Atractividad'
+            if score_col in plot_df.columns:
+                # size must be strictly positive for Plotly size parameter
+                plot_df['bubble_size'] = pd.to_numeric(plot_df[score_col], errors='coerce').fillna(1).apply(lambda x: max(0.5, float(x)))
             else:
                 plot_df['bubble_size'] = 1
                 
             fig = px.scatter(
                 plot_df, x=x_col, y=y_col, hover_name=campo_col, 
-                color='Score de Atractividad', color_continuous_scale='Blues',
+                color=score_col, color_continuous_scale='Blues',
                 size='bubble_size', size_max=40,
-                opacity=0.8
+                opacity=0.8,
+                template='plotly_dark'
             )
+
             
             fig.update_layout(
                 paper_bgcolor='rgba(0,0,0,0)',

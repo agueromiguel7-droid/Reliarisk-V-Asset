@@ -27,16 +27,6 @@ st.markdown("""
 /* Obsidian Observatory styling overrides */
 [data-testid="stSidebar"] { background-color: #1a1c1e !important; border-right: none !important; }
 .stApp { background-color: #121416 !important; }
-/* Universal font color fix to prevent dark-on-dark invisible text in default Light theme */
-html, body, [class*="css"], [class*="st-"], p, h1, h2, h3, h4, h5, h6, span, label, div {
-    color: #e2e2e5 !important;
-}
-/* Re-fix interactive backgrounds clashing with white font */
-div[data-baseweb="input"] > div, div[data-baseweb="select"] > div {
-    background-color: #1a1c1e !important;
-    border: 1px solid #4a5568 !important;
-}
-input, .stSelectbox div[role="combobox"] { color: #e2e2e5 !important; }
 div.block-container { padding-top: 3.5rem; }
 
 /* Dashboard Cards inside Risk Radar */
@@ -120,7 +110,24 @@ if authenticate_user():
     df = load_data()
     
     if df is not None:
+        # --- Global Area Filter ---
+        area_col = next((c for c in df.columns if 'Area' in c or 'Área' in c), None)
+        if area_col:
+            st.sidebar.markdown("---")
+            st.sidebar.subheader(get_text("nav_filters", "Filtros Globales"))
+            area_list = sorted(list(df[area_col].dropna().unique()))
+            selected_area = st.sidebar.selectbox(
+                get_text("filter_area", "Seleccionar Área"),
+                [get_text("all", "Todas")] + area_list,
+                key="global_area_filter"
+            )
+            if selected_area != get_text("all", "Todas"):
+                df = df[df[area_col] == selected_area].reset_index(drop=True)
+        
+        st.sidebar.markdown("---")
+        
         if page == get_text("nav_portfolio"):
+
             render_portfolio(df)
         elif page == get_text("nav_screener"):
             render_screener(df)

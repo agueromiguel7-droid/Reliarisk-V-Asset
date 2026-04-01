@@ -149,41 +149,37 @@ def render_detail_risk(df):
                     <div style="margin-top: -10px;">
                 """, unsafe_allow_html=True)
                 
-                infra_val = field_data.get('Infra_Num', 1)
-                inseg_val = field_data.get('Inseg_Num', 1)
+                # --- NEW Risk Level Radar ---
+                infra_val = field_data.get('PTO_infra', 0)
+                inseg_val = field_data.get('PTO_inseg', 0)
+                hum_val = field_data.get('PTO_drhe', 0)
                 
-                humano_col = next((c for c in df.columns if 'Humano' in c), None)
-                humano_val = 1
-                if humano_col:
-                    v = str(field_data.get(humano_col, '')).lower()
-                    if 'alta' in v: humano_val = 3
-                    elif 'media' in v: humano_val = 2
-                    elif 'baja' in v: humano_val = 1
-                    
-                vals = [infra_val, inseg_val, humano_val, infra_val]
+                vals = [infra_val, inseg_val, hum_val, infra_val]
                 
                 lang = st.session_state.get('language', 'Español')
-                labels = ['Infraestructura', 'Seguridad', 'Talento Humano', 'Infraestructura'] if lang == 'Español' else ['Infrastructure', 'Security', 'Human Talent', 'Infrastructure']
+                labels = ['Infraestructura', 'Inseguridad', 'Talento Humano', 'Infraestructura'] if lang == 'Español' else ['Infrastructure', 'Insecurity', 'Human Talent', 'Infrastructure']
                 
                 radar_df = pd.DataFrame(dict(r=vals, theta=labels))
                 
-                fig = px.line_polar(radar_df, r='r', theta='theta', line_close=True, range_r=[0, 3])
-                fig.update_traces(fill='toself', fillcolor='rgba(0, 90, 156, 0.5)', line_color='#81cfff', line_width=4)
+                fig = px.line_polar(radar_df, r='r', theta='theta', line_close=True, range_r=[0, 10])
+                fig.update_traces(fill='toself', fillcolor='rgba(0, 145, 255, 0.4)', line_color='#81cfff', line_width=4)
                 fig.update_layout(
                     polar=dict(
-                        radialaxis=dict(visible=True, range=[0, 3], gridcolor='#333'),
-                        angularaxis=dict(gridcolor='#333'),
+                        radialaxis=dict(visible=True, range=[0, 10], gridcolor='#444', tickfont=dict(size=10)),
+                        angularaxis=dict(gridcolor='#444', tickfont=dict(size=12)),
                         bgcolor='rgba(0,0,0,0)'
                     ),
                     paper_bgcolor='rgba(0,0,0,0)',
                     plot_bgcolor='rgba(0,0,0,0)',
                     font_color='#e2e2e5',
                     height=380,
-                    margin=dict(l=30, r=30, t=30, b=30)
+                    margin=dict(l=40, r=40, t=40, b=40)
                 )
                 
                 st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+                st.markdown(f"<div style='text-align:center; color:#81cfff; font-size:1.1rem; font-weight:bold;'>{get_text('idx_risk')}: {field_data.get('Nivel de Riesgo', 0):.2f}</div>", unsafe_allow_html=True)
                 st.markdown("</div></div>", unsafe_allow_html=True)
+
                 
         else:
             st.error(get_text('rad_err'))
