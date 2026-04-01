@@ -6,7 +6,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from src.auth import authenticate_user, render_user_profile
-from src.data_loader import load_data
+from src.data_loader import load_data, recalculate_stariv
 from src.i18n import get_text
 from views.portfolio import render_portfolio
 from views.screener import render_screener
@@ -123,6 +123,7 @@ if authenticate_user():
             )
             if selected_area != get_text("all", "Todas"):
                 df = df[df[area_col] == selected_area].reset_index(drop=True)
+                df = recalculate_stariv(df)
             st.markdown("<hr style='margin-top: 5px; margin-bottom: 25px; border-color: #333;'/>", unsafe_allow_html=True)
         
         if page == get_text("nav_portfolio"):
