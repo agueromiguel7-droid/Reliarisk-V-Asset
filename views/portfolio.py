@@ -195,7 +195,11 @@ def render_portfolio(df):
                 color='STARIV',
                 hover_data=hover_dict,
                 color_continuous_scale='Blues',
-                template='plotly_dark'
+                template='plotly_dark',
+                labels={
+                    campo_col: "Campo",
+                    ventaja_col: "Ventaja Estratégica"
+                } if ventaja_col else {campo_col: "Campo"}
             )
             fig.update_layout(yaxis={'categoryorder':'total ascending'})
             st.plotly_chart(fig, use_container_width=True)
