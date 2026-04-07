@@ -103,10 +103,30 @@ def render_portfolio(df):
                 map_df = df.dropna(subset=['Latitud', 'Longitud']).copy()
                 
                 if not map_df.empty:
-                    if reserva_col:
-                        map_df['radius'] = np.sqrt(pd.to_numeric(map_df[reserva_col], errors='coerce').fillna(1)) * 300
-                    else:
-                        map_df['radius'] = 1000
+                    # Metric selector for bubble size
+                    metric_choice = st.radio(
+                        get_text('port_bubble_metric'),
+                        ["STARIV", "RESERVAS"],
+                        index=0,
+                        horizontal=True,
+                        key="map_metric_selector"
+                    )
+
+                    if metric_choice == "STARIV":
+                        # STARIV scale (usually 0.8 to 1.4)
+                        s_min = map_df['STARIV'].min()
+                        s_max = map_df['STARIV'].max()
+                        if s_max > s_min:
+                            # Normalized spread for better visualization
+                            map_df['radius'] = ((map_df['STARIV'] - s_min) / (s_max - s_min) * 3500) + 800
+                        else:
+                            map_df['radius'] = 1500
+                    else: # RESERVAS
+                        if reserva_col:
+                            # Values vary from 1 to thousands (MMBN)
+                            map_df['radius'] = np.sqrt(pd.to_numeric(map_df[reserva_col], errors='coerce').fillna(1)) * 300
+                        else:
+                            map_df['radius'] = 1000
     
                     view_state = pdk.ViewState(
                         latitude=map_df['Latitud'].mean(),
@@ -125,11 +145,14 @@ def render_portfolio(df):
                         auto_highlight=True
                     )
                     
+                    # Enhanced tooltip strings
+                    res_info = f"\n{reserva_col}: " + "{" + reserva_col + "}" if reserva_col else ""
+                    
                     st.pydeck_chart(pdk.Deck(
                         map_style='dark',
                         initial_view_state=view_state,
                         layers=[layer],
-                        tooltip={"text": "{Campos}\nSTARIV: {STARIV}"}
+                        tooltip={"text": "{"+campo_col+"}\nSTARIV: {STARIV}" + res_info}
                     ))
                 else:
                     st.warning(get_text('port_no_coord'))
