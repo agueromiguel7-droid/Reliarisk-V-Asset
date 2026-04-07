@@ -77,7 +77,7 @@ def render_portfolio(df):
                             df = df[(pd.to_numeric(df[depth_col], errors='coerce') >= sel_depth[0]) & (pd.to_numeric(df[depth_col], errors='coerce') <= sel_depth[1]) | df[depth_col].isna()]
                         
                 if dev_col:
-                    dev_opts = df[dev_col].dropna().unique()
+                    dev_opts = sorted(df[dev_col].dropna().unique())
                     if len(dev_opts) > 0:
                         sel_dev = st.multiselect(get_text("filter_dev"), dev_opts, default=[])
                         if sel_dev:

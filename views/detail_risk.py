@@ -15,7 +15,7 @@ def render_detail_risk(df):
             # Give the selectbox its own clear space at the top
             col1, col2 = st.columns([1, 2])
             with col1:
-                selected_field = st.selectbox(get_text('rad_select'), df[campo_col].unique())
+                selected_field = st.selectbox(get_text('rad_select'), sorted(df[campo_col].unique()))
                 
             field_data = df[df[campo_col] == selected_field].iloc[0]
             

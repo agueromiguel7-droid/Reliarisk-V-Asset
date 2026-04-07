@@ -55,6 +55,7 @@ def render_screener(df):
 
         col1, _ = st.columns([1, 2])
         with col1:
+            available_sort_cols = sorted(available_sort_cols)
             selected_sort = st.selectbox(get_text('scr_sort_by'), available_sort_cols)
         
         if selected_sort and selected_sort in col_mapping:

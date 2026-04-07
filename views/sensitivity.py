@@ -12,7 +12,7 @@ def render_sensitivity(df):
         y_col_default = next((c for c in df.columns if 'Producción Actual' in c), None)
         campo_col = next((c for c in df.columns if 'Campos' in c), None)
         
-        numeric_cols = df.select_dtypes(include=['number']).columns.tolist()
+        numeric_cols = sorted(df.select_dtypes(include=['number']).columns.tolist())
         
         if len(numeric_cols) >= 2:
             col1, col2 = st.columns(2)
