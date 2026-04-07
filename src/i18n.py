@@ -78,7 +78,8 @@ translations = {
         "filter_area": "Select Area",
         "all": "All",
         "idx_stariv": "STARIV Index",
-        "idx_risk": "Risk Level Index"
+        "idx_risk": "Risk Level Index",
+        "port_bubble_metric": "Bubble size by:"
     },
     "Español": {
         "nav_title": "Navegación",
@@ -157,7 +158,8 @@ translations = {
         "filter_area": "Seleccionar Área",
         "all": "Todas",
         "idx_stariv": "Índice STARIV",
-        "idx_risk": "Nivel de Riesgo"
+        "idx_risk": "Nivel de Riesgo",
+        "port_bubble_metric": "Tamaño de la burbuja por:"
     }
 }
 
