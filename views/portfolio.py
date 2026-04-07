@@ -103,16 +103,11 @@ def render_portfolio(df):
                 map_df = df.dropna(subset=['Latitud', 'Longitud']).copy()
                 
                 if not map_df.empty:
-                    # Metric selector for bubble size
-                    metric_choice = st.radio(
-                        get_text('port_bubble_metric'),
-                        ["STARIV", "RESERVAS"],
-                        index=0,
-                        horizontal=True,
-                        key="map_metric_selector"
-                    )
+                    # Metric choice from session state or default
+                    # We define the selector at the bottom but need the value here
+                    m_choice = st.session_state.get("map_metric_selector", "STARIV")
 
-                    if metric_choice == "STARIV":
+                    if m_choice == "STARIV":
                         # STARIV scale (usually 0.8 to 1.4)
                         s_min = map_df['STARIV'].min()
                         s_max = map_df['STARIV'].max()
@@ -154,6 +149,16 @@ def render_portfolio(df):
                         layers=[layer],
                         tooltip={"text": "{"+campo_col+"}\nSTARIV: {STARIV}" + res_info}
                     ))
+
+                    st.markdown("<br/>", unsafe_allow_html=True)
+                    # Metric selector at the FOOT of the map (al pie del mapa)
+                    st.radio(
+                        f"**{get_text('port_bubble_metric')}**",
+                        ["STARIV", "RESERVAS"],
+                        index=0 if st.session_state.get("map_metric_selector") != "RESERVAS" else 1,
+                        horizontal=True,
+                        key="map_metric_selector"
+                    )
                 else:
                     st.warning(get_text('port_no_coord'))
             else:
