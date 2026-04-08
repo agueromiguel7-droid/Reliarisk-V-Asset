@@ -60,17 +60,13 @@ if authenticate_user():
     df = load_data()
 
     # === Top Navigation Bar ===
-    top_col_filter, top_col_user, top_col_lang, top_col_out = st.columns([5, 3, 1.2, 1.8])
+    top_col_area, top_col_dev, top_col_user, top_col_lang, top_col_out = st.columns([2.0, 2.0, 4.0, 1.2, 1.8])
     
-    with top_col_filter:
+    with top_col_area:
         if df is not None:
             area_col = next((c for c in df.columns if 'Area' in c or 'Área' in c), None)
             if area_col:
                 area_list = sorted(list(df[area_col].dropna().unique()))
-                st.markdown(
-                    "<div style='padding-top:2px;'></div>", 
-                    unsafe_allow_html=True
-                )
                 selected_area = st.selectbox(
                     f"🌍 {get_text('filter_area', 'Seleccionar Área Operativa')}",
                     [get_text("all", "Todas")] + area_list,
@@ -78,8 +74,26 @@ if authenticate_user():
                     label_visibility="collapsed"
                 )
                 if selected_area != get_text("all", "Todas"):
-                    df = df[df[area_col] == selected_area].reset_index(drop=True)
-                    df = recalculate_stariv(df)
+                    df = df[df[area_col] == selected_area]
+
+    with top_col_dev:
+        if df is not None:
+            dev_col = next((c for c in df.columns if 'Desarrollo' in c), None)
+            if dev_col:
+                dev_list = sorted(list(df[dev_col].dropna().unique()))
+                selected_dev = st.selectbox(
+                    f"🏗️ {get_text('filter_dev', 'Tipo de Desarrollo')}",
+                    [get_text("all", "Todas")] + dev_list,
+                    key="global_dev_filter",
+                    label_visibility="collapsed"
+                )
+                if selected_dev != get_text("all", "Todas"):
+                    df = df[df[dev_col] == selected_dev]
+                    
+    # Recalculate STARIV if we filtered the data
+    if df is not None:
+        df = df.reset_index(drop=True)
+        df = recalculate_stariv(df)
                     
     with top_col_user:
         role_label = "Admin" if st.session_state.get('role', 'inversor') == 'admin' else "Inv"
